@@ -527,12 +527,12 @@ pub fn version_num() -> u32 {
 
 /// Sciter engine version string (e.g. "`3.3.2.0`").
 pub fn version() -> String {
-	use types::BOOL;
-	let v1 = (_API.SciterVersion)(true as BOOL);
-	let v2 = (_API.SciterVersion)(false as BOOL);
-	let num = [v1 >> 16, v1 & 0xFFFF, v2 >> 16, v2 & 0xFFFF];
-	let version = format!("{}.{}.{}.{}", num[0], num[1], num[2], num[3]);
-	return version;
+  let num = version_num();
+  let major = (num >> 24) & 0xFF;
+  let minor = (num >> 16) & 0xFF;
+  let revision = (num >> 8) & 0xFF;
+  let build = num & 0xFF;
+  format!("{}.{}.{}.{}", major, minor, revision, build)
 }
 
 /// Sciter API version.
