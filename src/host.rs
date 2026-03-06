@@ -422,7 +422,7 @@ extern "system" fn _on_handle_notification<T: HostHandler>(pnm: *mut ::capi::scd
 
 	// process notification
 	let nm: &mut SCITER_CALLBACK_NOTIFICATION = unsafe { &mut *pnm };
-	let code: SCITER_NOTIFICATION = unsafe { ::std::mem::transmute(nm.code) };
+	let code = SCITER_NOTIFICATION::from_bits_truncate(nm.code);
 
 
 	let result: UINT = match code {

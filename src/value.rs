@@ -573,7 +573,7 @@ impl Value {
 		return v;
 	}
 
-  #[allow(clippy::mut_from_ref)]
+  #[allow(clippy::mut_from_ref, invalid_reference_casting)]
 	fn ensure_tmp_mut(&self) -> &mut Value {
 		let cp = self as *const Value;
 		let mp = cp as *mut Value;

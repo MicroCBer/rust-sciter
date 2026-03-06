@@ -43,7 +43,10 @@ impl VideoGen {
     let mut yd = 1;
     while site.is_alive() {
       // send an update portion
-      let buf: &[u8] = unsafe { std::mem::transmute(figure.as_ref()) };
+      // Convert &[u32] to &[u8] safely
+      let buf: &[u8] = unsafe {
+        std::slice::from_raw_parts(figure.as_ptr() as *const u8, figure.len() * std::mem::size_of::<u32>())
+      };
       site.render_frame_part(buf, (x, y), UPDATE);
 
       // set the next position

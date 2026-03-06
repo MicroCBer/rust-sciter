@@ -162,17 +162,17 @@ impl Default for SCITER_CREATE_WINDOW_FLAGS {
 	}
 }
 
-#[repr(C)]
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum SCITER_NOTIFICATION {
-  SC_LOAD_DATA = 1,
-  SC_DATA_LOADED = 2,
-  SC_ATTACH_BEHAVIOR = 4,
-  SC_ENGINE_DESTROYED = 5,
-  SC_POSTED_NOTIFICATION = 6,
-	SC_GRAPHICS_CRITICAL_FAILURE = 7,
-	SC_KEYBOARD_REQUEST = 8,
-	SC_INVALIDATE_RECT = 9,
+bitflags! {
+    pub struct SCITER_NOTIFICATION: u32 {
+        const SC_LOAD_DATA = 1;
+        const SC_DATA_LOADED = 2;
+        const SC_ATTACH_BEHAVIOR = 4;
+        const SC_ENGINE_DESTROYED = 5;
+        const SC_POSTED_NOTIFICATION = 6;
+        const SC_GRAPHICS_CRITICAL_FAILURE = 7;
+        const SC_KEYBOARD_REQUEST = 8;
+        const SC_INVALIDATE_RECT = 9;
+    }
 }
 
 #[repr(C)]

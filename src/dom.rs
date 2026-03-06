@@ -589,17 +589,17 @@ impl Element {
 	/// Sends sinking/bubbling event to the child/parent chain of the element.
 	pub fn send_event(&self, code: BEHAVIOR_EVENTS, reason: Option<CLICK_REASON>, source: Option<HELEMENT>) -> Result<bool> {
 		let mut handled = false as BOOL;
-		let r = reason.unwrap_or(CLICK_REASON::SYNTHESIZED);
+		let r = reason.unwrap_or(CLICK_REASON::SYNTHESIZED).bits();
 		let s = source.unwrap_or(self.he);
-		let ok = (_API.SciterSendEvent)(self.he, code as u32, s, r as UINT_PTR, &mut handled);
+		let ok = (_API.SciterSendEvent)(self.he, code.bits(), s, r as UINT_PTR, &mut handled);
 		ok_or!(handled != 0, ok)
 	}
 
 	/// Post asynchronously a sinking/bubbling event to the child/parent chain of the element.
 	pub fn post_event(&self, code: BEHAVIOR_EVENTS, reason: Option<CLICK_REASON>, source: Option<HELEMENT>) -> Result<()> {
-		let r = reason.unwrap_or(CLICK_REASON::SYNTHESIZED);
+		let r = reason.unwrap_or(CLICK_REASON::SYNTHESIZED).bits();
 		let s = source.unwrap_or(self.he);
-		let ok = (_API.SciterPostEvent)(self.he, code as u32, s, r as UINT_PTR);
+		let ok = (_API.SciterPostEvent)(self.he, code.bits(), s, r as UINT_PTR);
 		ok_or!((), ok)
 	}
 
@@ -607,8 +607,8 @@ impl Element {
 	pub fn fire_event(&self, code: BEHAVIOR_EVENTS, reason: Option<CLICK_REASON>, source: Option<HELEMENT>, post: bool, data: Option<Value>) -> Result<bool> {
 		let mut handled = false as BOOL;
 		let mut params = BEHAVIOR_EVENT_PARAMS {
-			cmd: code as UINT,
-			reason: reason.unwrap_or(CLICK_REASON::SYNTHESIZED) as UINT_PTR,
+			cmd: code.bits(),
+			reason: reason.unwrap_or(CLICK_REASON::SYNTHESIZED).bits() as UINT_PTR,
 			he: source.unwrap_or(self.he),
 			heTarget: self.he,
 			data: Default::default(),
@@ -632,7 +632,7 @@ impl Element {
 	pub fn broadcast_event(&self, name: &str, post: bool, data: Option<Value>) -> Result<bool> {
 		let name = s2w!(name);
 		let mut  params = BEHAVIOR_EVENT_PARAMS {
-			cmd: BEHAVIOR_EVENTS::CUSTOM as UINT,
+			cmd: BEHAVIOR_EVENTS::CUSTOM.bits(),
 			heTarget: HELEMENT!(),
 			reason: 0,
 			he: self.he,
@@ -686,17 +686,17 @@ impl Element {
       (_API.SciterCallBehaviorMethod)(self.he, p)
     };
     use capi::scbehavior::{METHOD_PARAMS, VALUE_PARAMS, IS_EMPTY_PARAMS};
-    use capi::scbehavior::BEHAVIOR_METHOD_IDENTIFIERS::*;
+    use capi::scbehavior::BEHAVIOR_METHOD_IDENTIFIERS;
     let ok = match params {
       event::MethodParams::Click => {
         let mut p = METHOD_PARAMS {
-          method: DO_CLICK as u32,
+          method: BEHAVIOR_METHOD_IDENTIFIERS::DO_CLICK.bits(),
         };
         call(&mut p as *mut _)
       },
       event::MethodParams::SetValue(v) => {
         let mut p = VALUE_PARAMS {
-          method: SET_VALUE as u32,
+          method: BEHAVIOR_METHOD_IDENTIFIERS::SET_VALUE.bits(),
           value: Default::default(),
         };
         v.pack_to(&mut p.value);
@@ -704,7 +704,7 @@ impl Element {
       },
       event::MethodParams::GetValue(retv) => {
         let mut p = VALUE_PARAMS {
-          method: SET_VALUE as u32,
+          method: BEHAVIOR_METHOD_IDENTIFIERS::GET_VALUE.bits(),
           value: Default::default(),
         };
         let ok = call(&mut p as *mut _ as *mut METHOD_PARAMS);
@@ -716,7 +716,7 @@ impl Element {
       },
       event::MethodParams::IsEmpty(retv) => {
         let mut p = IS_EMPTY_PARAMS {
-          method: IS_EMPTY as u32,
+          method: BEHAVIOR_METHOD_IDENTIFIERS::IS_EMPTY.bits(),
           is_empty: Default::default(),
         };
         let ok = call(&mut p as *mut _ as *mut METHOD_PARAMS);

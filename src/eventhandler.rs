@@ -162,11 +162,11 @@ fn process_events(me: &mut dyn EventHandler, he: HELEMENT, evtg: UINT, params: L
 			let nm = unsafe { &*scnm };
 
       use dom::event::EventReason;
-			let code :BEHAVIOR_EVENTS = unsafe{ ::std::mem::transmute(nm.cmd & 0x0_0FFF) };
-			let phase: PHASE_MASK = unsafe { ::std::mem::transmute(nm.cmd & 0xFFFF_F000) };
+			let code = BEHAVIOR_EVENTS::from_bits_truncate(nm.cmd & 0x0_0FFF);
+			let phase = PHASE_MASK::from_bits_truncate(nm.cmd & 0xFFFF_F000);
 			let reason = match code {
 				BEHAVIOR_EVENTS::EDIT_VALUE_CHANGED | BEHAVIOR_EVENTS::EDIT_VALUE_CHANGING => {
-					let reason: EDIT_CHANGED_REASON = unsafe{ ::std::mem::transmute(nm.reason as UINT) };
+					let reason = EDIT_CHANGED_REASON::from_bits_truncate(nm.reason as UINT);
 					EventReason::EditChanged(reason)
 				},
 
@@ -175,7 +175,7 @@ fn process_events(me: &mut dyn EventHandler, he: HELEMENT, evtg: UINT, params: L
 				}
 
 				_ => {
-					let reason: CLICK_REASON = unsafe{ ::std::mem::transmute(nm.reason as UINT) };
+					let reason = CLICK_REASON::from_bits_truncate(nm.reason as UINT);
 					EventReason::General(reason)
 				}
 			};
@@ -220,8 +220,7 @@ fn process_events(me: &mut dyn EventHandler, he: HELEMENT, evtg: UINT, params: L
       assert!(!params.is_null());
       let scnm = params as *const METHOD_PARAMS;
       let nm = unsafe { & *scnm };
-      let code: BEHAVIOR_METHOD_IDENTIFIERS = unsafe { ::std::mem::transmute((*nm).method) };
-      use capi::scbehavior::BEHAVIOR_METHOD_IDENTIFIERS::*;
+      let code = BEHAVIOR_METHOD_IDENTIFIERS::from_bits_truncate((*nm).method);
 
       // output values
       let mut method_value = Value::new();
@@ -232,16 +231,16 @@ fn process_events(me: &mut dyn EventHandler, he: HELEMENT, evtg: UINT, params: L
         // unpack method parameters
         use dom::event::MethodParams;
         let reason = match code {
-          DO_CLICK => {
+          code if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::DO_CLICK) => {
             MethodParams::Click
           },
-          IS_EMPTY => {
+          code if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::IS_EMPTY) => {
             MethodParams::IsEmpty(&mut is_empty)
           },
-          GET_VALUE => {
+          code if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::GET_VALUE) => {
             MethodParams::GetValue(&mut method_value)
           },
-          SET_VALUE => {
+          code if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::SET_VALUE) => {
             // Value from Sciter.
             let payload = params as *const VALUE_PARAMS;
             let pm = unsafe { & *payload };
@@ -260,20 +259,14 @@ fn process_events(me: &mut dyn EventHandler, he: HELEMENT, evtg: UINT, params: L
 
       if handled {
         // Pack values back to Sciter.
-        match code {
-          GET_VALUE => {
-            let payload = params as *mut VALUE_PARAMS;
-            let pm = unsafe { &mut *payload };
-            method_value.pack_to(&mut pm.value);
-          },
-
-          IS_EMPTY => {
-            let payload = params as *mut IS_EMPTY_PARAMS;
-            let pm = unsafe { &mut *payload };
-            pm.is_empty = is_empty as UINT;
-          },
-
-          _ => {},
+        if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::GET_VALUE) {
+          let payload = params as *mut VALUE_PARAMS;
+          let pm = unsafe { &mut *payload };
+          method_value.pack_to(&mut pm.value);
+        } else if code.contains(BEHAVIOR_METHOD_IDENTIFIERS::IS_EMPTY) {
+          let payload = params as *mut IS_EMPTY_PARAMS;
+          let pm = unsafe { &mut *payload };
+          pm.is_empty = is_empty as UINT;
         }
       }
       // we've done here

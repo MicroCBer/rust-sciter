@@ -680,10 +680,11 @@ impl Graphics {
 
   /// Draw a closed polygon.
   pub fn polygon(&mut self, points: &[Pos]) -> Result<&mut Self> {
-    // A compile time assert (credits to https://github.com/nvzqz/static-assertions-rs)
-    type PosArray = [Pos; 2];
-    type FloatArray = [SC_POS; 4];
-    let _ = ::std::mem::transmute::<FloatArray, PosArray>;
+    // Compile time assert: Pos is equivalent to [SC_POS; 2]
+    const _: () = {
+      assert!(::std::mem::size_of::<Pos>() == ::std::mem::size_of::<SC_POS>() * 2);
+      assert!(::std::mem::align_of::<Pos>() == ::std::mem::align_of::<SC_POS>());
+    };
 
     let ok = (_GAPI.gPolygon)(self.0, points.as_ptr() as *const SC_POS, points.len() as UINT);
     ok_or!(self, ok)
@@ -691,10 +692,11 @@ impl Graphics {
 
   /// Draw a polyline.
   pub fn polyline(&mut self, points: &[Pos]) -> Result<&mut Self> {
-    // A compile time assert (credits to https://github.com/nvzqz/static-assertions-rs)
-    type PosArray = [Pos; 2];
-    type FloatArray = [SC_POS; 4];
-    let _ = ::std::mem::transmute::<FloatArray, PosArray>;
+    // Compile time assert: Pos is equivalent to [SC_POS; 2]
+    const _: () = {
+      assert!(::std::mem::size_of::<Pos>() == ::std::mem::size_of::<SC_POS>() * 2);
+      assert!(::std::mem::align_of::<Pos>() == ::std::mem::align_of::<SC_POS>());
+    };
 
     let ok = (_GAPI.gPolyline)(self.0, points.as_ptr() as *const SC_POS, points.len() as UINT);
     ok_or!(self, ok)
@@ -770,7 +772,11 @@ impl Graphics {
 
   /// Setup parameters of a linear gradient of lines using multiple colors and color stop positions `(0.0 ... 1.0)`.
   pub fn line_linear_gradients(&mut self, start: Pos, end: Pos, colors: &[(Color, Dim)]) -> Result<&mut Self> {
-    let _ = ::std::mem::transmute::<SC_COLOR_STOP, (Color, Dim)>;
+    // Compile time assert: SC_COLOR_STOP is equivalent to (Color, Dim)
+    const _: () = {
+      assert!(::std::mem::size_of::<SC_COLOR_STOP>() == ::std::mem::size_of::<(Color, Dim)>());
+      assert!(::std::mem::align_of::<SC_COLOR_STOP>() == ::std::mem::align_of::<(Color, Dim)>());
+    };
     let ok = (_GAPI.gLineGradientLinear)(
       self.0,
       start.0,
@@ -791,7 +797,11 @@ impl Graphics {
 
   /// Setup parameters of linear gradient fills using multiple colors and color stop positions `(0.0 ... 1.0)`.
   pub fn fill_linear_gradients(&mut self, colors: &[(Color, Dim)], start: Pos, end: Pos) -> Result<&mut Self> {
-    let _ = ::std::mem::transmute::<SC_COLOR_STOP, (Color, Dim)>;
+    // Compile time assert: SC_COLOR_STOP is equivalent to (Color, Dim)
+    const _: () = {
+      assert!(::std::mem::size_of::<SC_COLOR_STOP>() == ::std::mem::size_of::<(Color, Dim)>());
+      assert!(::std::mem::align_of::<SC_COLOR_STOP>() == ::std::mem::align_of::<(Color, Dim)>());
+    };
     let ok = (_GAPI.gFillGradientLinear)(
       self.0,
       start.0,
@@ -812,7 +822,11 @@ impl Graphics {
 
   /// Setup parameters of a radial gradient of lines using multiple colors and color stop positions `(0.0 ... 1.0)`.
   pub fn line_radial_gradients(&mut self, point: Pos, radii: (Dim, Dim), colors: &[(Color, Dim)]) -> Result<&mut Self> {
-    let _ = ::std::mem::transmute::<SC_COLOR_STOP, (Color, Dim)>;
+    // Compile time assert: SC_COLOR_STOP is equivalent to (Color, Dim)
+    const _: () = {
+      assert!(::std::mem::size_of::<SC_COLOR_STOP>() == ::std::mem::size_of::<(Color, Dim)>());
+      assert!(::std::mem::align_of::<SC_COLOR_STOP>() == ::std::mem::align_of::<(Color, Dim)>());
+    };
     let ok = (_GAPI.gLineGradientRadial)(
       self.0,
       point.0,
@@ -833,7 +847,11 @@ impl Graphics {
 
   /// Setup parameters of radial gradient of fills using multiple colors and color stop positions `(0.0 ... 1.0)`.
   pub fn fill_radial_gradients(&mut self, colors: &[(Color, Dim)], point: Pos, radii: (Dim, Dim)) -> Result<&mut Self> {
-    let _ = ::std::mem::transmute::<SC_COLOR_STOP, (Color, Dim)>;
+    // Compile time assert: SC_COLOR_STOP is equivalent to (Color, Dim)
+    const _: () = {
+      assert!(::std::mem::size_of::<SC_COLOR_STOP>() == ::std::mem::size_of::<(Color, Dim)>());
+      assert!(::std::mem::align_of::<SC_COLOR_STOP>() == ::std::mem::align_of::<(Color, Dim)>());
+    };
     let ok = (_GAPI.gFillGradientRadial)(
       self.0,
       point.0,

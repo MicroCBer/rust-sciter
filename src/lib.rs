@@ -202,7 +202,8 @@ mod ext {
         return Ok(0 as ApiType);
       }
 
-      let get_api: FuncType = unsafe { std::mem::transmute(sym) };
+      // SAFETY: sym is a valid function pointer from GetProcAddress
+      let get_api: FuncType = unsafe { std::mem::transmute_copy(&sym) };
       return Ok(get_api());
     }
     let sdkbin = if cfg!(target_arch = "x86_64") { "bin/64" } else { "bin/32" };
@@ -345,7 +346,8 @@ mod ext {
         return Ok(0 as ApiType);
       }
 
-      let get_api: FuncType = unsafe { std::mem::transmute(sym) };
+      // SAFETY: sym is a valid function pointer from dlsym
+      let get_api: FuncType = unsafe { std::mem::transmute_copy(&sym) };
       return Ok(get_api());
     }
 
