@@ -23,7 +23,7 @@ pub struct ISciterAPI
 	pub version: UINT,
 
 	pub SciterClassName: extern "system" fn () -> LPCWSTR,
-	pub SciterVersion: extern "system" fn (major: BOOL) -> UINT,
+	pub SciterVersion: extern "system" fn (num: u32) -> UINT,
 
 	pub SciterDataReady: extern "system" fn (hwnd: HWINDOW, uri: LPCWSTR, data: LPCBYTE, dataLength: UINT) -> BOOL,
 	pub SciterDataReadyAsync: extern "system" fn (hwnd: HWINDOW, uri: LPCWSTR, data: LPCBYTE, dataLength: UINT, requestId: HREQUEST) -> BOOL,

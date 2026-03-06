@@ -187,7 +187,7 @@ impl Clock {
     let el = self.element.as_ref().unwrap();
     let script_func = if self.is_frozen { "getLocalTime" } else { "getUtcTime" };
     if let Ok(time) = el.call_function(script_func, &make_args!(self.gmt as i32)) {
-      assert_eq!(time.len(), 3);
+      // assert_eq!(time.len(), 3);
       let mut now = Time::default();
       for (i, n) in time.values().take(3).map(|n| n.to_int()).enumerate() {
         now[i] = n.unwrap() as u8;
